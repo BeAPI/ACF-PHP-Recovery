@@ -8,3 +8,4 @@ Use this plugin to import fieldsets from PHP exports. <strong>Do not use this fo
 4. Check the boxes next to the fieldsets to import and then click the 'Import' button.
 5. The fieldset are imported into the database with '(Recovered)' postfixed to the title.
 
+* It currently only works with ACF 3 and is not working with ACF 4 yet. *
