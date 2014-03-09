@@ -7,5 +7,5 @@ Use this plugin to import fieldsets from PHP exports. <strong>Do not use this fo
 3. Go to 'Custom Fields' > 'PHP Recovery' page.
 4. Check the boxes next to the fieldsets to import and then click the 'Import' button.
 5. The fieldset are imported into the database with '(Recovered)' postfixed to the title.
+6. Remove (or just comment out) the PHP defined fields as their UID may conflict with the imported fields. Commonly if you leave them in, you will only see the last field on the fieldset edit screen.
 
-<strong>It currently only works with ACF 3 and is not working with ACF 4 yet.</strong>

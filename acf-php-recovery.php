@@ -3,7 +3,7 @@
   Plugin Name: ACF PHP Recovery Tool
   Description: Converts your PHP export back-in as editable fields for when you lose the original database and XML.
   Author: Seamus Leahy
-  Version: 0.1
+  Version: 0.2
  */
 
 function acf_php_recovery_menu() {
@@ -33,17 +33,26 @@ function acf_php_recovery_page() {
 
         // Meta values
         // Location: Rules and 'All or Any'
-        foreach($fieldset['location'] as $key => $val) {
-          add_post_meta( $post_id, $key, $val, true);
-        }
+        // foreach($fieldset['location'] as $key => $val) {
+        //   add_post_meta( $post_id, $key, $val, true);
+        // }
+
 
         // Options: position, layout, hide_on_screen
         foreach($fieldset['options'] as $key => $val) {
           add_post_meta( $post_id, $key, $val, true);
         }
 
+        // TODO the location/rules
+
         // Fields
-        foreach($fieldset['fields'] as $field) {
+        $order_no = 0; // Keep track of the ordering of the field for display purposes
+        foreach( $fieldset['fields'] as $field ) {
+          if( isset($field['order_no']) ) {
+            $order_no = max( $order_no, $field['order_no'] );
+          } else {
+            $field['order_no'] = $order_no++;
+          }
           add_post_meta( $post_id, $field['key'], $field, true);
         }
 
@@ -74,6 +83,7 @@ function acf_php_recovery_page() {
           <?php
         }
       ?>
+        <li><strong><?php _e( 'Remove the PHP defined fields! The duplicate field IDs interfer with the editing of the fields.' ); ?></strong></li>
       </ul>
       </div>
     <?php
