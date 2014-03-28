@@ -33,9 +33,11 @@ function acf_php_recovery_page() {
 
         // Meta values
         // Location: Rules and 'All or Any'
-        // foreach($fieldset['location'] as $key => $val) {
-        //   add_post_meta( $post_id, $key, $val, true);
-        // }
+        foreach($fieldset['location'] as $key => $val) {
+          foreach( $val as $rule ) {
+            add_post_meta( $post_id, 'rule', $rule, false );
+          }
+        }
 
 
         // Options: position, layout, hide_on_screen
