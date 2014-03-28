@@ -33,9 +33,13 @@ function acf_php_recovery_page() {
 
         // Meta values
         // Location: Rules and 'All or Any'
-        foreach($fieldset['location'] as $key => $val) {
-          foreach( $val as $rule ) {
-            add_post_meta( $post_id, 'rule', $rule, false );
+        foreach($fieldset['location'] as $group_id => $group) {
+          if( is_array( $group ) ) {
+            foreach( $group as $rule_id => $rule ) {
+              $rule['order_no'] = $rule_id;
+              $rule['group_no'] = $group_id;
+              add_post_meta( $post_id, 'rule', $rule, false );
+            }
           }
         }
 
