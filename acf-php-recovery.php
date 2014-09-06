@@ -116,7 +116,7 @@ function acf_php_recovery_page() {
           } else {
             $links = array();
             foreach($matches as $match) {
-              $links[] = '<a href='.get_edit_post_link($match->ID).'">'.$match->post_title.'</a>';
+              $links[] = '<a href="'.get_edit_post_link($match->ID).'">'.$match->post_title.'</a>';
             }
             echo implode(', ', $links);
           }
