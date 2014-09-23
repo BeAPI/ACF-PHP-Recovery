@@ -42,25 +42,25 @@ function acf_php_recovery_page() {
           'id' => $saved_group['ID'],
         );
       }
-
-      // This requires multipile runs to handle sub-fields that have their parent set to the parent field instead of the group
-      $field_parents = $import_fieldsets; // The groups and fields
-      $imported_fields = array(); // Keep track of the already imported
-      do {
-        $num_import = 0;
-        foreach( $acf_local->fields as $key => $field ) {
-          if ( !in_array($key, $imported_fields) && in_array($field['parent'], $field_parents) ) {
-            $num_import = $num_import + 1;
-            $field_parents[] = $key;
-            $imported_fields[] = $key;
-
-            $field['parent'] = $key_to_post_id[$field['parent']]; // Convert the key into the post_parent
-            $saved_field = acf_update_field( $field );
-            $key_to_post_id[$key] = $saved_field['ID'];
-          }
-        }
-      } while( $num_import > 0 );
     }
+
+    // This requires multipile runs to handle sub-fields that have their parent set to the parent field instead of the group
+    $field_parents = $import_fieldsets; // The groups and fields
+    $imported_fields = array(); // Keep track of the already imported
+    do {
+      $num_import = 0;
+      foreach( $acf_local->fields as $key => $field ) {
+        if ( !in_array($key, $imported_fields) && in_array($field['parent'], $field_parents) ) {
+          $num_import = $num_import + 1;
+          $field_parents[] = $key;
+          $imported_fields[] = $key;
+
+          $field['parent'] = $key_to_post_id[$field['parent']]; // Convert the key into the post_parent
+          $saved_field = acf_update_field( $field );
+          $key_to_post_id[$key] = $saved_field['ID'];
+        }
+      }
+    } while( $num_import > 0 );
   }
 
 
