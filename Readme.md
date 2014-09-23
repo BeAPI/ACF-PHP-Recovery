@@ -1,4 +1,4 @@
-# Advanced Custom Fields Recovery Tool from PHP Export#
+# Advanced Custom Fields v 5.0 Recovery Tool from PHP Export #
 
 Use this plugin to import fieldsets from PHP exports. <strong>Do not use this for your workflow of importing and exporting. Use it only as a recovery tool when you lose the original database and XML files.</strong>
 
@@ -16,5 +16,3 @@ https://github.com/iamntz/acf-recovery
 ## Thanks ##
 
 Thanks to Elliot Condon http://www.elliotcondon.com/ for creating Advance Custom Fields.
-
-Thanks to dmh-kevin https://github.com/dmh-kevin for figuring out the 'order_no' for ACF v4.
