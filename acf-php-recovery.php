@@ -70,6 +70,18 @@ function acf_php_recovery_page() {
   <h2>ACF PHP Recovery Tool</h2>
 
   <?php
+  // Check the version of ACF
+  $acf_version = explode( '.', acf_get_setting('version') );
+  if ( $acf_version[0] != '5' ):
+  ?>
+  <div id="message" class="error below-h2">
+    <p><?php printf( __( 'This tool was built for ACF version 5 and you have version %s.' ), $acf_version[0] ); ?></p>
+  </div>
+  <?php
+  endif;
+  ?>
+
+  <?php
   if(!empty($imported)) {
     ?>
       <div id="message" class="updated below-h2"><p><?php _e('Fieldsets recovered'); ?>.</p>
