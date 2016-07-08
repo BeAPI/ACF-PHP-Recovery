@@ -1,0 +1,9 @@
+{
+	"name": "seamusleahy/ACF-PHP-Recovery",
+	"desciption": "WordPress plugin to recovery Advanced Custom Fields fieldsets from PHP export",
+	"type": "wordpress-plugin",
+    "homepage": "https://github.com/seamusleahy/ACF-PHP-Recovery",
+    "require": {
+        "php": ">=5.4"
+    }
+}
