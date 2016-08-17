@@ -1,5 +1,3 @@
-**Looking for a new maintainer. If you want to maintain this project, create an issue and I'll transfer the project to you.** I haven't been developing in WordPress for the last two years which means I'm becoming out-of-date with changes to ACF and WordPress.
-
 # Advanced Custom Fields v 5.0 Recovery Tool from PHP Export #
 
 Use this plugin to import fieldsets from PHP exports. <strong>Do not use this for your workflow of importing and exporting. Use it only as a recovery tool when you lose the original database and XML files.</strong>
