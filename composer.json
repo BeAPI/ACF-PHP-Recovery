@@ -1,8 +1,14 @@
 {
 	"name": "BeAPI/ACF-PHP-Recovery",
-	"desciption": "WordPress plugin to recovery Advanced Custom Fields fieldsets from PHP export",
+	"desciption": "WordPress plugin to recover Advanced Custom Fields fieldsets from PHP export.",
 	"type": "wordpress-plugin",
     	"homepage": "https://github.com/BeAPI/ACF-PHP-Recovery",
+    	"authors": [
+	    	{
+			 "name": "BeAPI",
+			 "email": "human@beapi.fr"
+	    	}
+	  ],
     	"require": {
         	"php": ">=5.4"
     	}
