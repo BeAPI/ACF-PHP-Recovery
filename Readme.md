@@ -16,4 +16,5 @@ https://github.com/iamntz/acf-recovery
 ## Thanks ##
 
 Thanks to Elliot Condon http://www.elliotcondon.com/ for creating Advanced Custom Fields.
+
 Thanks to Seamus Leahy https://github.com/seamusleahy for creating this project.
