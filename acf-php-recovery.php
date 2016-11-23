@@ -115,7 +115,7 @@ function acf_php_recovery_page() {
     <tr>
       <td><input type="checkbox" name="fieldsets[]" value="<?php echo esc_attr($key); ?>" /></td>
       <td><?php echo $field_group['title']; ?></td>
-      <td><?php $matches = $wpdb->get_results("SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%{$field_group['title']}%' AND post_type='".ACFPR_GROUP_POST_TYPE."'");
+      <td><?php $matches = $wpdb->get_results("SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%{$field_group['title']}%' AND post_type='".ACFPR_GROUP_POST_TYPE."' AND post_status='publish'");
           if(empty($matches)) {
             echo '<em>none</em>';
           } else {
