@@ -115,9 +115,11 @@ function acf_php_recovery_page() {
     <tr>
       <td><input type="checkbox" name="fieldsets[]" value="<?php echo esc_attr($key); ?>" /></td>
       <td><?php echo $field_group['title']; ?></td>
-      <td><?php 
-          $sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%{$field_group['title']}%' AND post_type='".ACFPR_GROUP_POST_TYPE."'";
-          $matches = $wpdb->get_results(apply_filters('acf_recovery_filter_query', $sql));
+      <td><?php
+          // Set default to publish
+          $post_status = apply_filters( 'acf_recovery\query\post_status', 'publish' );
+          $sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%{$field_group['title']}%' AND post_type='".ACFPR_GROUP_POST_TYPE."' AND post_status="'.esc_sql($post_status).'";
+          $matches = $wpdb->get_results($sql);
           if(empty($matches)) {
             echo '<em>none</em>';
           } else {
