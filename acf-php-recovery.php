@@ -159,7 +159,7 @@ function acf_php_recovery_page() {
 
 // Add settings link on plugin page
 function acf_php_recovery_settings_link($links) {
-  $settings_link = '<a href="edit.php?post_type=acf&page=acf-php-import">ACF PHP Recovery</a>';
+  $settings_link = '<a href="edit.php?post_type=acf-field-group&page=acf-php-import">ACF PHP Recovery</a>';
   array_unshift($links, $settings_link);
   return $links;
 }
