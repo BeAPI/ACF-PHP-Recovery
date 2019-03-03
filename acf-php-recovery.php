@@ -14,10 +14,32 @@ function acf_php_recovery_menu() {
 }
 add_action('admin_menu', 'acf_php_recovery_menu', 100);
 
+
+function acf_php_recover_group_fields($fields, $field_parents, $imported_fields, $key_to_post_id) {
+  foreach ($fields as $key => $field) {
+    if (in_array($key, $imported_fields)) {
+      continue;
+    }
+
+    $field_parents[] = $key;
+    $imported_fields[] = $key;
+
+    $field['parent'] = $key_to_post_id[$field['parent']]; // Convert the key into the post_parent
+    $saved_field = acf_update_field($field);
+    $key_to_post_id[$key] = $saved_field['ID'];
+
+    $newFields = acf_get_local_fields($field['key']);
+    if (! empty($newFields)) {
+      acf_php_recover_group_fields($newFields, $field_parents, $imported_fields, $key_to_post_id);
+    }
+  }
+}
+
+
 function acf_php_recovery_page() {
   global $wpdb;
 
-  $acf_local = acf_local();
+  $acf_local = acf_get_local_field_groups();
 
   // process the form
   if(isset($_POST['acf_php_recovery_action']) && $_POST['acf_php_recovery_action'] == 'import' && isset($_POST['fieldsets']) && check_admin_referer( 'acf_php_recovery' ) ) {
@@ -28,7 +50,7 @@ function acf_php_recovery_page() {
     $key_to_post_id = array(); // Group or field key to post id
 
     // Now we can import the groups
-    foreach( $acf_local->groups as $key => $group ) {
+    foreach( $acf_local as $key => $group ) {
       $group['title'] = $group['title'] . ' (Recovered)';
 
       // Only import those that were selected
@@ -47,115 +69,99 @@ function acf_php_recovery_page() {
 
     // This requires multipile runs to handle sub-fields that have their parent set to the parent field instead of the group
     $field_parents = $import_fieldsets; // The groups and fields
-    $imported_fields = array(); // Keep track of the already imported
-    do {
-      $num_import = 0;
-      foreach( $acf_local->fields as $key => $field ) {
-        if ( !in_array($key, $imported_fields) && in_array($field['parent'], $field_parents) ) {
-          $num_import = $num_import + 1;
-          $field_parents[] = $key;
-          $imported_fields[] = $key;
+    $imported_fields = array();
 
-          $field['parent'] = $key_to_post_id[$field['parent']]; // Convert the key into the post_parent
-          $saved_field = acf_update_field( $field );
-          $key_to_post_id[$key] = $saved_field['ID'];
-        }
-      }
-    } while( $num_import > 0 );
+    foreach (array_reverse($field_parents) as $parent) {
+      $fields = acf_get_local_fields($parent);
+      acf_php_recover_group_fields($fields, $field_parents, $imported_fields, $key_to_post_id);
+    }
   }
 
 
   // output
   ?>
   <div class="wrap">
-  <h2>ACF PHP Recovery Tool</h2>
+    <h2>ACF PHP Recovery Tool</h2>
 
-  <?php
-  // Check the version of ACF
-  $acf_version = explode( '.', acf_get_setting('version') );
-  if ( $acf_version[0] != '5' ):
-  ?>
-  <div id="message" class="error below-h2">
-    <p><?php printf( __( 'This tool was built for ACF version 5 and you have version %s.' ), $acf_version[0] ); ?></p>
-  </div>
-  <?php
-  endif;
-  ?>
-
-  <?php
-  if(!empty($imported)) {
-    ?>
-      <div id="message" class="updated below-h2"><p><?php _e('Fieldsets recovered'); ?>.</p>
-      <ul>
-      <?php
-        foreach($imported as $import) {
-          ?>
-          <li><?php edit_post_link( $import['title'], '', '', $import['id']); ?></li>
-          <?php
-        }
+    <?php
+    // Check the version of ACF
+    $acf_version = explode( '.', acf_get_setting('version') );
+    if ( $acf_version[0] != '5' ):
       ?>
-        <li><strong><?php _e( 'Remove the PHP defined fields! The duplicate field IDs interfer with the editing of the fields.' ); ?></strong></li>
-      </ul>
+      <div id="message" class="error below-h2">
+        <p><?php printf( __( 'This tool was built for ACF version 5 and you have version %s.' ), $acf_version[0] ); ?></p>
       </div>
     <?php
-  }
-  ?>
-
-  <p><strong>This is a recovery tool. Do not use this as part of your workflow for importing and exporting ACF fieldsets.</strong></p>
-  <form method="POST">
-  <table class="widefat">
-    <thead>
-      <th>Import</th>
-      <th>Name</th>
-      <th>Possible Existing Matches</th>
-    </thead>
-    <tbody>
-    <?php
-    foreach( $acf_local->groups as $key => $field_group ): ?>
-    <tr>
-      <td><input type="checkbox" name="fieldsets[]" value="<?php echo esc_attr($key); ?>" /></td>
-      <td><?php echo $field_group['title']; ?></td>
-      <td><?php
-		  $sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%s' AND post_type='".ACFPR_GROUP_POST_TYPE."'";
-          // Set post status
-          $post_status = apply_filters( 'acf_recovery\query\post_status', '' );
-          if ( ! empty( $post_status ) ) {
-			   $sql .= ' AND post_status="'.esc_sql($post_status).'"';
-          }
-          $matches = $wpdb->get_results( $wpdb->prepare( $sql, '%'. $wpdb->esc_like( $field_group['title'] ) .'%' ) );
-          if(empty($matches)) {
-            echo '<em>none</em>';
-          } else {
-            $links = array();
-            foreach($matches as $match) {
-              $links[] = '<a href="'.get_edit_post_link($match->ID).'">'.$match->post_title.'</a>';
-            }
-            echo implode(', ', $links);
-          }
-      ?></td>
-    </tr>
-    <?php
-    endforeach;
+    endif;
     ?>
-    </tbody>
-  </table>
-    <?php wp_nonce_field( 'acf_php_recovery' ); ?>
-    <input type="hidden" name="acf_php_recovery_action" value="import" />
-    <p class="submit">
-      <input type="submit" value="Import" class="button-primary" />
-    </p>
-  </form>
 
-  <h3>Registered Field Groups</h3>
-  <pre class="">
-  <?php echo var_export( $acf_local->groups ); ?>
-  </pre>
+    <?php
+    if(!empty($imported)) {
+      ?>
+      <div id="message" class="updated below-h2"><p><?php _e('Fieldsets recovered'); ?>.</p>
+        <ul>
+          <?php
+          foreach($imported as $import) {
+            ?>
+            <li><?php edit_post_link( $import['title'], '', '', $import['id']); ?></li>
+            <?php
+          }
+          ?>
+          <li><strong><?php _e( 'Remove the PHP defined fields! The duplicate field IDs interfer with the editing of the fields.' ); ?></strong></li>
+        </ul>
+      </div>
+      <?php
+    }
+    ?>
+
+    <p><strong>This is a recovery tool. Do not use this as part of your workflow for importing and exporting ACF fieldsets.</strong></p>
+    <form method="POST">
+      <table class="widefat">
+        <thead>
+        <th>Import</th>
+        <th>Name</th>
+        <th>Possible Existing Matches</th>
+        </thead>
+        <tbody>
+        <?php
+        foreach( $acf_local as $key => $field_group ): ?>
+          <tr>
+            <td><input type="checkbox" name="fieldsets[]" value="<?php echo esc_attr($key); ?>" /></td>
+            <td><?php echo $field_group['title']; ?></td>
+            <td><?php
+              $sql = "SELECT ID, post_title FROM $wpdb->posts WHERE post_title LIKE '%s' AND post_type='".ACFPR_GROUP_POST_TYPE."'";
+              // Set post status
+              $post_status = apply_filters( 'acf_recovery\query\post_status', '' );
+              if ( ! empty( $post_status ) ) {
+                $sql .= ' AND post_status="'.esc_sql($post_status).'"';
+              }
+              $matches = $wpdb->get_results( $wpdb->prepare( $sql, '%'. $wpdb->esc_like( $field_group['title'] ) .'%' ) );
+              if(empty($matches)) {
+                echo '<em>none</em>';
+              } else {
+                $links = array();
+                foreach($matches as $match) {
+                  $links[] = '<a href="'.get_edit_post_link($match->ID).'">'.$match->post_title.'</a>';
+                }
+                echo implode(', ', $links);
+              }
+              ?></td>
+          </tr>
+        <?php
+        endforeach;
+        ?>
+        </tbody>
+      </table>
+      <?php wp_nonce_field( 'acf_php_recovery' ); ?>
+      <input type="hidden" name="acf_php_recovery_action" value="import" />
+      <p class="submit">
+        <input type="submit" value="Import" class="button-primary" />
+      </p>
+    </form>
 
   </div>
   <?php
 }
-
-
 
 // Add settings link on plugin page
 function acf_php_recovery_settings_link($links) {
@@ -166,4 +172,3 @@ function acf_php_recovery_settings_link($links) {
 
 $plugin = plugin_basename(__FILE__);
 add_filter("plugin_action_links_$plugin", 'acf_php_recovery_settings_link' );
-
