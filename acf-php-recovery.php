@@ -18,7 +18,9 @@ add_action('admin_menu', 'acf_php_recovery_menu', 100);
 function acf_php_recovery_page() {
 	global $wpdb;
 
-	$acf_local_groups = acf_get_local_field_groups();
+	$acf_local_groups = version_compare(acf_get_setting('version'), '5.7.11') >= 0
+		? acf_get_local_field_groups()
+		: acf_local();
 	$acf_local_fields = acf_get_local_fields();
 
 	// process the form
